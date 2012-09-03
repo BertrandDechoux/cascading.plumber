@@ -49,7 +49,7 @@ public class PlumberTest {
 	 * in the source repository.
 	 */
 	@Before
-	private void setup() {
+	public void setup() {
 		System.getProperties().setProperty("line.separator", "\r\n");
 	}
 
