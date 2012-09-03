@@ -10,6 +10,12 @@
 	<name>cascading.plumber</name>
 	<url>http://maven.apache.org</url>
 
+	<scm>
+		<connection>scm:git@github.com:BertrandDechoux/cascading.plumber.git</connection>
+		<url>scm:git:git@github.com:BertrandDechoux/cascading.plumber.git</url>
+		<developerConnection>scm:git:git@github.com:BertrandDechoux/cascading.plumber.git</developerConnection>
+	</scm>
+
 	<properties>
 		<maven.compiler.source>1.6</maven.compiler.source>
 		<maven.compiler.target>1.6</maven.compiler.target>
