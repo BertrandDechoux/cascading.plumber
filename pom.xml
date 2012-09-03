@@ -70,4 +70,12 @@
 		</repository>
 	</repositories>
 
+	<distributionManagement>
+		<repository>
+			<id>conjars</id>
+			<name>Conjars repository</name>
+			<url>https://conjars.org/repo</url>
+		</repository>
+	</distributionManagement>
+
 </project>
