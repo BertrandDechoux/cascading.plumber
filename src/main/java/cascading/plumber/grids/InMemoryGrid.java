@@ -22,6 +22,9 @@ import java.util.Properties;
 import cascading.flow.FlowConnector;
 import cascading.flow.local.LocalFlowConnector;
 import cascading.plumber.Grid;
+import cascading.tap.Tap;
+import cascading.tap.local.FileTap;
+import cascading.tap.local.TemplateTap;
 
 /**
  * Implementation of {@link Grid} locally in memory. The new mode of Cascading
@@ -41,6 +44,20 @@ public final class InMemoryGrid extends AbstractGrid {
 	@Override
 	public FlowConnector createFlowConnector(Properties properties) {
 		return new LocalFlowConnector(properties);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see cascading.plumber.Grid#createTemplateTap(cascading.tap.Tap,
+	 * java.lang.String)
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public <Config, Input, Output> Tap<Config, Input, Output> createTemplateTap(
+			Tap<Config, Input, Output> parent, String pathTemplate) {
+		// Can only handle FileTap. This is the implementation's limitation.
+		return (Tap<Config, Input, Output>) new TemplateTap((FileTap) parent, pathTemplate);
 	}
 
 }

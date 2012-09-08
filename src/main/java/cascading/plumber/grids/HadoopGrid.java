@@ -22,6 +22,9 @@ import java.util.Properties;
 import cascading.flow.FlowConnector;
 import cascading.flow.hadoop.HadoopFlowConnector;
 import cascading.plumber.Grid;
+import cascading.tap.Tap;
+import cascading.tap.hadoop.Hfs;
+import cascading.tap.hadoop.TemplateTap;
 
 /**
  * Implementation of {@link Grid} for Hadoop. The default, historic mode of
@@ -29,12 +32,30 @@ import cascading.plumber.Grid;
  */
 public final class HadoopGrid extends AbstractGrid {
 
-	/* (non-Javadoc)
-	 * @see cascading.plumber.grid.AbstractGrid#createFlowConnector(java.util.Properties)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * cascading.plumber.grid.AbstractGrid#createFlowConnector(java.util.Properties
+	 * )
 	 */
 	@Override
 	public FlowConnector createFlowConnector(Properties properties) {
 		return new HadoopFlowConnector(properties);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see cascading.plumber.Grid#createTemplateTap(cascading.tap.Tap,
+	 * java.lang.String)
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public <Config, Input, Output> Tap<Config, Input, Output> createTemplateTap(
+			Tap<Config, Input, Output> parent, String pathTemplate) {
+		// Can only handle Hfs. This is the implementation's limitation.
+		return (Tap<Config, Input, Output>) new TemplateTap((Hfs) parent, pathTemplate);
 	}
 
 }

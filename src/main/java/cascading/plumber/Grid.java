@@ -44,6 +44,14 @@ public interface Grid extends RecipesHolder {
 			String uriPath, Object schemeKey);
 
 	/**
+	 * Create a template {@link Tap}.
+	 * @see cascading.tap.local.TemplateTap
+	 * @see cascading.tap.hadoop.TemplateTap
+	 */
+	<Config, Input, Output> Tap<Config, Input, Output> createTemplateTap(
+			Tap<Config, Input, Output> parent, String pathTemplate);
+
+	/**
 	 * Create a {@link FlowConnector} related to the implementation of the
 	 * {@link Grid}.
 	 */

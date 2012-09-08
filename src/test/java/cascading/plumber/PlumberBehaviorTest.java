@@ -30,7 +30,7 @@ public class PlumberBehaviorTest {
 	
 	@Test
 	public void shouldAllowForNoScheme() {
-		String sourcePath = "/directory";
+		String sourcePath = "target/output/none.txt";
 		
 		Plumber plumber = Plumbing.getDefaultPlumber();
 		Grid grid = plumber.useInMemoryGrid();
@@ -44,7 +44,7 @@ public class PlumberBehaviorTest {
 		thrown.expect(IllegalArgumentException.class);
 		thrown.expectMessage("Unable to find Scheme for scheme key 'unmappedKey'. Current mapping is {DefaultTextLineKey=TextLine[['offset', 'line']->[ALL]]}.");
 		
-		String sourcePath = "/directory";
+		String sourcePath = "target/output/none.txt";
 		
 		Plumber plumber = Plumbing.getDefaultPlumber();
 		Grid grid = plumber.useInMemoryGrid();

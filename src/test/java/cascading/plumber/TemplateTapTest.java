@@ -23,7 +23,6 @@ import java.util.Properties;
 import org.junit.Before;
 import org.junit.Test;
 
-import cascading.flow.Flow;
 import cascading.flow.FlowConnector;
 import cascading.pipe.Pipe;
 import cascading.pipe.assembly.Retain;
@@ -31,49 +30,43 @@ import cascading.tap.Tap;
 import cascading.tuple.Fields;
 
 /**
- * Demonstrate the use case of {@link Plumber}.
+ * Demonstrate the use case of TemplateTap.
  */
-public class PlumberTest {
+public class TemplateTapTest {
 
 	@Before
 	public void setup() {
 		Testing.setup();
 	}
 
-	/**
-	 * Launch a simple cascading {@link Flow} in memory by only switching a
-	 * flag.
-	 */
 	@Test
-	public void shouldRunInMemory() {
+	public void shouldDispatchResultOfCopyOnAnOffsetBasis() {
 		Testing.setup();
 
 		boolean hadoop = false;
 		String sourcePath = "src/test/resources/extract.txt";
-		String sinkPath = "target/output/copy/extract.txt";
+		String sinkPath = "target/output/dispatch";
 
-		launchCopy(hadoop, sourcePath, sinkPath);
-		Testing.assertSame(sinkPath, sourcePath);
+		launch(hadoop, sourcePath, sinkPath);
+		Testing.assertSame("src/test/resources/dispatch/0", "target/output/dispatch/0");
+		Testing.assertSame("src/test/resources/dispatch/1", "target/output/dispatch/1");
+		Testing.assertSame("src/test/resources/dispatch/2", "target/output/dispatch/2");
+		Testing.assertSame("src/test/resources/dispatch/3", "target/output/dispatch/3");
+		Testing.assertSame("src/test/resources/dispatch/4", "target/output/dispatch/4");
+		Testing.assertSame("src/test/resources/dispatch/5", "target/output/dispatch/5");
 	}
 
-	/**
-	 * Launch a copy {@link Flow}. This definition is platform agnostic and
-	 * could be used with a Hadoop cluster.
-	 */
-	@SuppressWarnings("rawtypes")
-	private void launchCopy(boolean hadoop, String sourcePath, String sinkPath) {
-		// get you preferred Grid using a Plumber
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private void launch(boolean hadoop, String sourcePath, String sinkPath) {
 		Plumber plumber = Plumbing.getDefaultPlumber();
 		Grid grid = plumber.useGrid(hadoop);
 		
-		// create the Grid related taps
 		Tap source = grid.createTap(sourcePath, Plumbing.SchemeKeys.TEXT_LINE);
 		Tap sink = grid.createTap(sinkPath, Plumbing.SchemeKeys.TEXT_LINE);
+		sink = grid.createTemplateTap(sink, "%s");
 
-		// create your Flow (here a simple copy all lines)
-		Pipe pipe = new Retain(new Pipe("main"), new Fields("line"));
+		Pipe pipe = new Retain(new Pipe("copy-dispatch"), new Fields( "offset", "line" ) );
 
-		// connect and run the Flow using the Grid related FlowConnector
 		FlowConnector connector = grid.createFlowConnector(new Properties());
 		connector.connect("main", source, sink, pipe).complete();
 	}
