@@ -36,7 +36,7 @@ public final class Plumbing {
 		 * Key for using a default grid implementation agnostic TextLine
 		 * {@link Scheme}.
 		 */
-		Object TEXT_LINE = new Object();
+		Object TEXT_LINE = new DefaultTextLineKey();
 	}
 
 	/**
@@ -58,7 +58,7 @@ public final class Plumbing {
 	 * 
 	 * @see SchemeKeys#TEXT_LINE
 	 */
-	private static void addDefaultSchemeRecipes(Plumber plumber) {
+	public static void addDefaultSchemeRecipes(Plumber plumber) {
 		plumber.registerTextLine(SchemeKeys.TEXT_LINE, new Fields("offset",
 				"line"));
 	}
@@ -69,12 +69,27 @@ public final class Plumbing {
 	 * {@link InMemoryGrid}. You only need to change the uri path when creating
 	 * the {@link Tap}.
 	 */
-	private static void addDefaultTapRecipes(Plumber plumber) {
+	public static void addDefaultTapRecipes(Plumber plumber) {
 		plumber.useHadoopGrid().register(null, new HfsFactory());
 		plumber.useHadoopGrid().register("hfs", new HfsFactory());
 		plumber.useHadoopGrid().register("dfs", new DfsFactory());
 		plumber.useHadoopGrid().register("lfs", new LfsFactory());
 		plumber.useInMemoryGrid().register(null, new FileTapFactory());
 	}
+	
+	/**
+	 * Custom class for default TextLine key. Provide a short description and an
+	 * instance which should not be equal to any user provided key.
+	 */
+	private static class DefaultTextLineKey {
+		/* (non-Javadoc)
+		 * @see java.lang.Object#toString()
+		 */
+		@Override
+		public String toString() {
+			return getClass().getSimpleName();
+		}
+	}
+	
 
 }

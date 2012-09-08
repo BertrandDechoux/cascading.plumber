@@ -18,10 +18,6 @@
 
 package cascading.plumber;
 
-import static org.fest.assertions.Assertions.assertThat;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.Properties;
 
 import org.junit.Before;
@@ -34,23 +30,14 @@ import cascading.pipe.assembly.Retain;
 import cascading.tap.Tap;
 import cascading.tuple.Fields;
 
-import com.google.common.base.Charsets;
-import com.google.common.base.Throwables;
-import com.google.common.io.Files;
-
 /**
  * Demonstrate the use case of {@link Plumber}.
  */
 public class PlumberTest {
 
-	/**
-	 * In order to be able to compare the content of files across platforms, the
-	 * line seperator should be constant and consistent with the reference file
-	 * in the source repository.
-	 */
 	@Before
 	public void setup() {
-		System.getProperties().setProperty("line.separator", "\r\n");
+		Testing.setup();
 	}
 
 	/**
@@ -59,14 +46,14 @@ public class PlumberTest {
 	 */
 	@Test
 	public void shouldRunInMemory() {
-		setup();
+		Testing.setup();
 
 		boolean hadoop = false;
 		String sourcePath = "src/test/resources/extract.txt";
 		String sinkPath = "target/output/extract.txt";
 
 		launchCopy(hadoop, sourcePath, sinkPath);
-		assertSame(sinkPath, sourcePath);
+		Testing.assertSame(sinkPath, sourcePath);
 	}
 
 	/**
@@ -75,32 +62,19 @@ public class PlumberTest {
 	 */
 	@SuppressWarnings("rawtypes")
 	private void launchCopy(boolean hadoop, String sourcePath, String sinkPath) {
+		// get you preferred Grid using a Plumber
 		Plumber plumber = Plumbing.getDefaultPlumber();
 		Grid grid = plumber.useGrid(hadoop);
+		
+		// create the Grid related taps
 		Tap source = grid.createTap(sourcePath, Plumbing.SchemeKeys.TEXT_LINE);
 		Tap sink = grid.createTap(sinkPath, Plumbing.SchemeKeys.TEXT_LINE);
 
+		// create your Flow (here a simple copy all lines)
 		Pipe pipe = new Retain(new Pipe("main"), new Fields("line"));
 
+		// connect and run the Flow using the Grid related FlowConnector
 		FlowConnector connector = grid.createFlowConnector(new Properties());
 		connector.connect("main", source, sink, pipe).complete();
-	}
-
-	/**
-	 * Assert that both files have the same content.
-	 */
-	private void assertSame(String referencePath, String outputPath) {
-		assertThat(contentOf(outputPath)).isEqualTo(contentOf(referencePath));
-	}
-
-	/**
-	 * @return the full content of the file as a {@link String}
-	 */
-	private String contentOf(String filename) {
-		try {
-			return Files.toString(new File(filename), Charsets.UTF_8);
-		} catch (IOException e) {
-			throw Throwables.propagate(e);
-		}
 	}
 }

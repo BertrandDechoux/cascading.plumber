@@ -39,7 +39,7 @@ import cascading.tap.Tap;
  * of the {@link FlowConnector} change.
  */
 public abstract class AbstractGrid implements Grid {
-	private Map<Object, Scheme<?, ?, ?, ?, ?>> keyToSchemes = new HashMap<Object, Scheme<?, ?, ?, ?, ?>>();
+	private Map<Object, Scheme<?, ?, ?, ?, ?>> keyToScheme = new HashMap<Object, Scheme<?, ?, ?, ?, ?>>();
 	private Map<String, TapFactory> uriSchemeToTap = new HashMap<String, TapFactory>();
 
 	/*
@@ -52,7 +52,7 @@ public abstract class AbstractGrid implements Grid {
 	public final <Config, Input, Output, SourceContext, SinkContext> void register(
 			Object key,
 			Scheme<Config, Input, Output, SourceContext, SinkContext> scheme) {
-		keyToSchemes.put(key, scheme);
+		keyToScheme.put(key, scheme);
 	}
 
 	/*
@@ -78,8 +78,9 @@ public abstract class AbstractGrid implements Grid {
 			String uriPath, Object schemeKey) {
 		try {
 			URI uri = new URI(uriPath);
-			return (Tap<Config, Input, Output>) uriSchemeToTap.get(
-					uri.getScheme()).create(uri, keyToSchemes.get(schemeKey));
+			TapFactory tapFactory = getTapFactory(uri);
+			Scheme<?, ?, ?, ?, ?> scheme = getScheme(schemeKey);
+			return (Tap<Config, Input, Output>) tapFactory.create(uri, scheme);
 		} catch (URIException e) {
 			throw new IllegalArgumentException(e);
 		} catch (URISyntaxException e) {
@@ -130,6 +131,42 @@ public abstract class AbstractGrid implements Grid {
 			properties.put(entry.getValue(), entry.getKey());
 		}
 		return properties;
+	}
+
+	/**
+	 * Get the {@link TapFactory} associated with the {@link URI}'s scheme. If
+	 * none, throw an explicit {@link Exception} with the current mapping.
+	 */
+	private TapFactory getTapFactory(URI uri) {
+		TapFactory tapFactory = uriSchemeToTap.get(uri.getScheme());
+		if(tapFactory == null) {
+			StringBuffer buffer = new StringBuffer();
+			buffer.append("Unable to find TapFactory for uriScheme '");
+			buffer.append(uri.getScheme());
+			buffer.append("'. Current mapping is ");
+			buffer.append(uriSchemeToTap);
+			buffer.append(".");
+			throw new IllegalArgumentException(buffer.toString());
+		}
+		return tapFactory;
+	}
+
+	/**
+	 * Get the {@link Scheme} associated with the schemeKey. Explicitly fail if
+	 * a non-null key was provided and no associated {@link Scheme} was found.
+	 */
+	private Scheme<?, ?, ?, ?, ?> getScheme(Object schemeKey) {
+		Scheme<?, ?, ?, ?, ?> scheme = keyToScheme.get(schemeKey);
+		if (scheme == null && schemeKey !=null) {
+			StringBuffer buffer = new StringBuffer();
+			buffer.append("Unable to find Scheme for scheme key '");
+			buffer.append(schemeKey);
+			buffer.append("'. Current mapping is ");
+			buffer.append(keyToScheme);
+			buffer.append(".");
+			throw new IllegalArgumentException(buffer.toString());
+		}
+		return scheme;
 	}
 
 }

@@ -29,7 +29,13 @@ import cascading.tap.local.FileTap;
 /**
  * {@link TapFactory} for {@link FileTap}.
  */
-public final class FileTapFactory implements TapFactory {
+public final class FileTapFactory extends AbstractTapFactory {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see cascading.plumber.TapFactory#create(java.net.URI,
+	 * cascading.scheme.Scheme)
+	 */
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public <Config, Input, Output, SourceContext, SinkContext> Tap<Config, Input, Output> create(

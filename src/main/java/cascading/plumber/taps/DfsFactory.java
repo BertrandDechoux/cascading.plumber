@@ -29,7 +29,7 @@ import cascading.tap.hadoop.Dfs;
 /**
  * {@link TapFactory} for {@link Dfs}.
  */
-public final class DfsFactory implements TapFactory {
+public final class DfsFactory extends AbstractTapFactory {
 	/*
 	 * (non-Javadoc)
 	 * 

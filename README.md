@@ -7,16 +7,20 @@ See [PlumberTest.java](https://github.com/BertrandDechoux/cascading.plumber/blob
 
 Here is how to launch a copy Flow without any hardwiring to Hadoop Cascading or InMemory Cascading :
 ```java
-    private void launchCopy(boolean hadoop, String sourcePath, String sinkPath) {
-      Plumber plumber = Plumbing.getDefaultPlumber();
-      Grid grid = plumber.useGrid(hadoop);
-      
-      Tap source = grid.createTap(sourcePath, Plumbing.SchemeKeys.TEXT_LINE);
-      Tap sink = grid.createTap(sinkPath, Plumbing.SchemeKeys.TEXT_LINE);
+	private void launchCopy(boolean hadoop, String sourcePath, String sinkPath) {
+		// get you preferred Grid using a Plumber
+		Plumber plumber = Plumbing.getDefaultPlumber();
+		Grid grid = plumber.useGrid(hadoop);
+		
+		// create the Grid related taps
+		Tap source = grid.createTap(sourcePath, Plumbing.SchemeKeys.TEXT_LINE);
+		Tap sink = grid.createTap(sinkPath, Plumbing.SchemeKeys.TEXT_LINE);
 
-      Pipe pipe = new Retain(new Pipe("main"), new Fields("line"));
+		// create your Flow (here a simple copy all lines)
+		Pipe pipe = new Retain(new Pipe("main"), new Fields("line"));
 
-      FlowConnector connector = grid.createFlowConnector(new Properties());
-      connector.connect("main", source, sink, pipe).complete();
-    }
+		// connect and run the Flow using the Grid related FlowConnector
+		FlowConnector connector = grid.createFlowConnector(new Properties());
+		connector.connect("main", source, sink, pipe).complete();
+	}
 ```
