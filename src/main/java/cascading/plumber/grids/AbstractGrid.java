@@ -128,7 +128,7 @@ public abstract class AbstractGrid implements Grid {
 	private Properties asProperties(Iterable<Entry<String, String>> conf) {
 		Properties properties = new Properties();
 		for (Entry<String, String> entry : conf) {
-			properties.put(entry.getValue(), entry.getKey());
+			properties.put(entry.getKey(), entry.getValue());
 		}
 		return properties;
 	}
