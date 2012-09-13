@@ -19,7 +19,6 @@
 		<maven.compiler.source>1.6</maven.compiler.source>
 		<maven.compiler.target>1.6</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<versions.cascading>2.0.4</versions.cascading>
 	</properties>
 
 	<dependencies>
@@ -43,15 +42,17 @@
 			<scope>test</scope>
 		</dependency>
 		<!-- real dependencies -->
+	<!-- conjars doesn't interpret properties-based versions, so use duplicated 
+		hard-coded values instead... -->
 		<dependency>
 			<groupId>cascading</groupId>
 			<artifactId>cascading-hadoop</artifactId>
-			<version>${versions.cascading}</version>
+			<version>2.0.4</version>
 		</dependency>
 		<dependency>
 			<groupId>cascading</groupId>
 			<artifactId>cascading-local</artifactId>
-			<version>${versions.cascading}</version>
+			<version>2.0.4</version>
 		</dependency>
 		<!-- provided -->
 		<dependency>
