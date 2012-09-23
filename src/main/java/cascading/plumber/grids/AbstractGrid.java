@@ -27,6 +27,8 @@ import java.util.Properties;
 import org.apache.commons.httpclient.URIException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapred.JobConf;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cascading.flow.FlowConnector;
 import cascading.plumber.Grid;
@@ -39,6 +41,7 @@ import cascading.tap.Tap;
  * of the {@link FlowConnector} change.
  */
 public abstract class AbstractGrid implements Grid {
+	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 	private Map<Object, Scheme<?, ?, ?, ?, ?>> keyToScheme = new HashMap<Object, Scheme<?, ?, ?, ?, ?>>();
 	private Map<String, TapFactory> uriSchemeToTap = new HashMap<String, TapFactory>();
 
@@ -52,7 +55,11 @@ public abstract class AbstractGrid implements Grid {
 	public final <Config, Input, Output, SourceContext, SinkContext> void register(
 			Object key,
 			Scheme<Config, Input, Output, SourceContext, SinkContext> scheme) {
-		keyToScheme.put(key, scheme);
+		LOGGER.trace("Register Scheme {} with key {}", scheme, key);
+		Object previous = keyToScheme.put(key, scheme);
+		if (previous != null) {
+			LOGGER.debug("Association for key {} changed to Scheme {}", key, scheme);
+		}
 	}
 
 	/*
@@ -63,7 +70,11 @@ public abstract class AbstractGrid implements Grid {
 	 */
 	@Override
 	public final void register(String uriScheme, TapFactory tapFactory) {
-		uriSchemeToTap.put(uriScheme, tapFactory);
+		LOGGER.trace("Register TapFactory {} with uri scheme {}", tapFactory, uriScheme);
+		Object previous = uriSchemeToTap.put(uriScheme, tapFactory);
+		if (previous != null) {
+			LOGGER.debug("Association for uri scheme {} changed to TapFactory {}", uriScheme, tapFactory);
+		}
 	}
 
 	/*
@@ -139,7 +150,7 @@ public abstract class AbstractGrid implements Grid {
 	 */
 	private TapFactory getTapFactory(URI uri) {
 		TapFactory tapFactory = uriSchemeToTap.get(uri.getScheme());
-		if(tapFactory == null) {
+		if (tapFactory == null) {
 			StringBuffer buffer = new StringBuffer();
 			buffer.append("Unable to find TapFactory for uriScheme '");
 			buffer.append(uri.getScheme());
@@ -157,7 +168,7 @@ public abstract class AbstractGrid implements Grid {
 	 */
 	private Scheme<?, ?, ?, ?, ?> getScheme(Object schemeKey) {
 		Scheme<?, ?, ?, ?, ?> scheme = keyToScheme.get(schemeKey);
-		if (scheme == null && schemeKey !=null) {
+		if (scheme == null && schemeKey != null) {
 			StringBuffer buffer = new StringBuffer();
 			buffer.append("Unable to find Scheme for scheme key '");
 			buffer.append(schemeKey);

@@ -19,15 +19,22 @@ package cascading.plumber.grids;
 
 import static org.fest.assertions.Assertions.assertThat;
 
+import java.net.URI;
 import java.util.Properties;
 
+import org.apache.commons.httpclient.URIException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapred.JobConf;
 import org.junit.Test;
 
 import cascading.flow.FlowConnector;
 import cascading.plumber.Grid;
+import cascading.plumber.Plumber;
+import cascading.plumber.Plumbing;
+import cascading.plumber.TapFactory;
+import cascading.scheme.Scheme;
 import cascading.tap.Tap;
+import cascading.tuple.Fields;
 
 /**
  * Test of common codes of the two {@link Grid} implementations.
@@ -48,6 +55,34 @@ public class AbstractGridTest {
 		JobConf jobConf = new JobConf();
 		jobConf.set(KEY, VALUE);
 		new MockGrid().createFlowConnector(jobConf);
+	}
+
+	@Test
+	public void shouldAllowOverRegistrationOfScheme() {
+		Plumber plumber = Plumbing.getDefaultPlumber();
+		Object key = "testKey";
+		plumber.registerTextLine(key, new Fields("line"));
+		plumber.registerTextLine(key, new Fields("line"));
+	}
+	
+	@Test
+	public void shouldAllowOverRegistrationOfTapFactory() {
+		Plumber plumber = Plumbing.getDefaultPlumber();
+		plumber.register("test", new MyTapFactory());
+		plumber.register("test", new MyTapFactory());
+	}
+
+	/**
+	 * Mock implementation of a {@link TapFactory}.
+	 */
+	private final class MyTapFactory implements TapFactory {
+		@Override
+		public <Config, Input, Output, SourceContext, SinkContext> Tap<Config, Input, Output> create(
+				URI uri,
+				Scheme<Config, Input, Output, SourceContext, SinkContext> scheme)
+				throws URIException {
+			throw new IllegalStateException();
+		}
 	}
 
 	/**
