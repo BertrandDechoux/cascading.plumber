@@ -137,6 +137,7 @@ public abstract class AbstractGrid implements Grid {
 	 * {@link Properties}.
 	 */
 	private Properties asProperties(Iterable<Entry<String, String>> conf) {
+		// TODO use cascading.properties.Props#buildProperties(...) ?
 		Properties properties = new Properties();
 		for (Entry<String, String> entry : conf) {
 			properties.put(entry.getKey(), entry.getValue());
