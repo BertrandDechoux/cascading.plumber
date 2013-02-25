@@ -3,7 +3,7 @@
 
 	<groupId>cascading.plumber</groupId>
 	<artifactId>plumber</artifactId>
-	<version>0.1.3-SNAPSHOT</version>
+	<version>0.1.3</version>
 	<packaging>jar</packaging>
 
 	<name>cascading.plumber</name>
