@@ -24,3 +24,7 @@ Here is how to launch a copy Flow without any hardwiring to Hadoop Cascading or 
 		connector.connect("main", source, sink, pipe).complete();
 	}
 ```
+
+Of course, the jar is available on conjars.org like all cascading libraries and extensions.
+http://conjars.org/cascading.plumber/plumber
+
